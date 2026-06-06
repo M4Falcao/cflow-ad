@@ -50,6 +50,8 @@ def main(c):
         c.data_path = './data/STC/shanghaitech'
     elif c.dataset == 'video':
         c.data_path = c.video_path
+    elif c.dataset == 'insplad':
+        c.data_path = r'C:\Users\teo-s\Documents\GitHub\anomaly-detection-dataset\insplad-seg\insplad-seg'
     else:
         raise NotImplementedError('{} is not supported dataset!'.format(c.dataset))
     # output settings

@@ -172,6 +172,58 @@ def load_encoder_arch(c, L):
             encoder[blocks[0]].block[-1][-3].register_forward_hook(get_activation(pool_layers[pool_cnt]))
             pool_dims.append(encoder[blocks[0]].block[-1][-3].out_channels)
             pool_cnt = pool_cnt + 1
+    elif c.enc_arch == 'sediffernet':
+        import sys
+        sys.path.append(r"C:\Users\teo-s\Documents\GitHub\anomaly-v3\anomaly-detection-pesquisa\differnet")
+        from model import SEDifferNet
+
+        class SEDifferNet_Encoder(nn.Module):
+            def __init__(self, checkpoint_path):
+                super().__init__()
+                full_model = SEDifferNet()
+                data = torch.load(checkpoint_path, map_location='cpu', weights_only=False)
+                full_model.load_state_dict(data['model_state_dict'], strict=False)
+                self.alexnet = full_model.alexnet
+                self.simsa1 = full_model.simsa1
+                self.simsa2 = full_model.simsa2
+                self.simsa3 = full_model.simsa3
+                self.simsa4 = full_model.simsa4
+
+            def forward(self, x):
+                x = self.alexnet.features[0](x)
+                x = self.alexnet.features[1](x)
+                x = self.simsa1(x)
+                x = self.alexnet.features[2](x)
+                x = self.alexnet.features[3](x)
+                x = self.alexnet.features[4](x)
+                x = self.simsa2(x)
+                x = self.alexnet.features[5](x)
+                x = self.alexnet.features[6](x)
+                x = self.alexnet.features[7](x)
+                x = self.alexnet.features[8](x)
+                x = self.alexnet.features[9](x)
+                x = self.alexnet.features[10](x)
+                x = self.alexnet.features[11](x)
+                x = self.simsa4(x)
+                x = self.alexnet.features[12](x)
+                return x
+
+        checkpoint_path = r"C:\Users\teo-s\Documents\GitHub\anomaly-v3\anomaly-detection-pesquisa\differnet\final_models\SEDiffernet\vari-grip\vari-grip_se_differnet_vari_grip_200_1_epoch_163.pt"
+        encoder = SEDifferNet_Encoder(checkpoint_path)
+        
+        if L >= 3:
+            encoder.simsa4.register_forward_hook(get_activation(pool_layers[pool_cnt]))
+            pool_dims.append(256)
+            pool_cnt += 1
+        if L >= 2:
+            encoder.simsa2.register_forward_hook(get_activation(pool_layers[pool_cnt]))
+            pool_dims.append(192)
+            pool_cnt += 1
+        if L >= 1:
+            encoder.simsa1.register_forward_hook(get_activation(pool_layers[pool_cnt]))
+            pool_dims.append(64)
+            pool_cnt += 1
+
     else:
         raise NotImplementedError('{} is not supported architecture!'.format(c.enc_arch))
     #

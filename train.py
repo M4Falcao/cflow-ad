@@ -279,6 +279,9 @@ def train(c):
     elif c.dataset == 'stc':
         train_dataset = StcDataset(c, is_train=True)
         test_dataset  = StcDataset(c, is_train=False)
+    elif c.dataset == 'insplad':
+        train_dataset = InspladDataset(c, is_train=True)
+        test_dataset  = InspladDataset(c, is_train=False)
     else:
         raise NotImplementedError('{} is not supported dataset!'.format(c.dataset))
     #

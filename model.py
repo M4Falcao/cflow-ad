@@ -173,21 +173,23 @@ def load_encoder_arch(c, L):
             pool_dims.append(encoder[blocks[0]].block[-1][-3].out_channels)
             pool_cnt = pool_cnt + 1
     elif c.enc_arch == 'sediffernet':
-        import sys
-        sys.path.append(r"C:\Users\teo-s\Documents\GitHub\anomaly-v3\anomaly-detection-pesquisa\differnet")
-        from model import SEDifferNet
+        from torchvision.models import alexnet
+        from fightingcv_attention.attention.SEAttention import SEAttention
 
         class SEDifferNet_Encoder(nn.Module):
             def __init__(self, checkpoint_path):
                 super().__init__()
-                full_model = SEDifferNet()
+                self.alexnet = alexnet(pretrained=False)
+                self.simsa1 = SEAttention(channel=64, reduction=2)
+                self.simsa2 = SEAttention(channel=192, reduction=2)
+                self.simsa3 = SEAttention(channel=384, reduction=2)
+                self.simsa4 = SEAttention(channel=256, reduction=2)
+                
                 data = torch.load(checkpoint_path, map_location='cpu', weights_only=False)
-                full_model.load_state_dict(data['model_state_dict'], strict=False)
-                self.alexnet = full_model.alexnet
-                self.simsa1 = full_model.simsa1
-                self.simsa2 = full_model.simsa2
-                self.simsa3 = full_model.simsa3
-                self.simsa4 = full_model.simsa4
+                state_dict = data['model_state_dict']
+                
+                filtered_dict = {k: v for k, v in state_dict.items() if k.startswith('alexnet.') or k.startswith('simsa')}
+                self.load_state_dict(filtered_dict, strict=False)
 
             def forward(self, x):
                 x = self.alexnet.features[0](x)
@@ -208,7 +210,7 @@ def load_encoder_arch(c, L):
                 x = self.alexnet.features[12](x)
                 return x
 
-        checkpoint_path = r"C:\Users\teo-s\Documents\GitHub\anomaly-v3\anomaly-detection-pesquisa\differnet\final_models\SEDiffernet\vari-grip\vari-grip_se_differnet_vari_grip_200_1_epoch_163.pt"
+        checkpoint_path = c.sediffernet_ckpt_path
         encoder = SEDifferNet_Encoder(checkpoint_path)
         
         if L >= 3:

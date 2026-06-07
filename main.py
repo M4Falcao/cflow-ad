@@ -51,12 +51,12 @@ def main(c):
     elif c.dataset == 'video':
         c.data_path = c.video_path
     elif c.dataset == 'insplad':
-        c.data_path = r'C:\Users\teo-s\Documents\GitHub\anomaly-detection-dataset\insplad-seg\insplad-seg'
+        c.data_path = c.insplad_path
     else:
         raise NotImplementedError('{} is not supported dataset!'.format(c.dataset))
     # output settings
     c.verbose = True
-    c.hide_tqdm_bar = True
+    c.hide_tqdm_bar = False
     c.save_results = True
     # unsup-train
     c.print_freq = 2
@@ -78,15 +78,16 @@ def main(c):
     ########
     os.environ['CUDA_VISIBLE_DEVICES'] = c.gpu
     c.use_cuda = not c.no_cuda and torch.cuda.is_available()
-    init_seeds(seed=int(time.time()))
+    init_seeds(seed=42)
     c.device = torch.device("cuda" if c.use_cuda else "cpu")
+    print(f"\n[INFO] Usando dispositivo: {c.device} (CUDA available: {torch.cuda.is_available()})\n")
     # selected function:
     if c.action_type in ['norm-train', 'norm-test']:
         train(c)
     else:
         raise NotImplementedError('{} is not supported action-type!'.format(c.action_type))
 
-
+''
 if __name__ == '__main__':
     c = get_args()
     main(c)

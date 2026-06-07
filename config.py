@@ -26,19 +26,19 @@ def get_args():
                         help='image resize dimensions (default: 256)')
     parser.add_argument("--action-type", default='norm-train', type=str, metavar='T',
                         help='norm-train/norm-test (default: norm-train)')
-    parser.add_argument('-bs', '--batch-size', default=32, type=int, metavar='B',
+    parser.add_argument('-bs', '--batch-size', default=8, type=int, metavar='B',
                         help='train batch size (default: 32)')
     parser.add_argument('--lr', type=float, default=2e-4, metavar='LR',
                         help='learning rate (default: 2e-4)')
-    parser.add_argument('--meta-epochs', type=int, default=25, metavar='N',
+    parser.add_argument('--meta-epochs', type=int, default=20, metavar='N',
                         help='number of meta epochs to train (default: 25)')
-    parser.add_argument('--sub-epochs', type=int, default=8, metavar='N',
+    parser.add_argument('--sub-epochs', type=int, default=5, metavar='N',
                         help='number of sub epochs to train (default: 8)')
     parser.add_argument('--pro', action='store_true', default=False,
                         help='enables estimation of AUPRO metric')
     parser.add_argument('--viz', action='store_true', default=False,
                         help='saves test data visualizations')
-    parser.add_argument('--workers', default=4, type=int, metavar='G',
+    parser.add_argument('--workers', default=0, type=int, metavar='G',
                         help='number of data loading workers (default: 4)')
     parser.add_argument("--gpu", default='0', type=str, metavar='G',
                         help='GPU device number')
@@ -46,6 +46,10 @@ def get_args():
                         help='disables CUDA training')
     parser.add_argument('--video-path', default='.', type=str, metavar='D',
                         help='video file path')
+    parser.add_argument('--insplad-path', default=r"C:\Users\teo-s\Documents\GitHub\anomaly-detection-dataset\insplad-seg\insplad-seg", type=str, metavar='D',
+                        help='path to insplad dataset')
+    parser.add_argument('--sediffernet-ckpt-path', default=r"C:\Users\teo-s\Documents\GitHub\anomaly-v3\anomaly-detection-pesquisa\differnet\final_models\SEDiffernet\vari-grip\vari-grip_se_differnet_vari_grip_200_1_epoch_163.pt", type=str, metavar='D',
+                        help='path to sediffernet checkpoint')
 
     args = parser.parse_args()
     

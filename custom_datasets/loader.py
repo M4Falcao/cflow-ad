@@ -2,7 +2,10 @@ import os
 from PIL import Image
 import numpy as np
 import torch
-from torchvision.io import read_video, write_jpeg
+try:
+    from torchvision.io import read_video, write_jpeg
+except ImportError:
+    read_video, write_jpeg = None, None
 from torch.utils.data import Dataset
 from torchvision import transforms as T
 
@@ -30,13 +33,13 @@ class InspladDataset(Dataset):
         self.x, self.y, self.mask = self.load_dataset_folder()
         if is_train:
             self.transform_x = T.Compose([
-                T.Resize(c.img_size, Image.ANTIALIAS),
+                T.Resize(c.img_size, Image.LANCZOS),
                 T.RandomRotation(5),
                 T.CenterCrop(c.crp_size),
                 T.ToTensor()])
         else:
             self.transform_x = T.Compose([
-                T.Resize(c.img_size, Image.ANTIALIAS),
+                T.Resize(c.img_size, Image.LANCZOS),
                 T.CenterCrop(c.crp_size),
                 T.ToTensor()])
         self.transform_mask = T.Compose([
@@ -80,7 +83,7 @@ class InspladDataset(Dataset):
                 y.extend([1] * len(img_fpath_list))
                 gt_type_dir = os.path.join(gt_dir, img_type)
                 img_fname_list = [os.path.splitext(os.path.basename(f))[0] for f in img_fpath_list]
-                gt_fpath_list = [os.path.join(gt_type_dir, img_fname + '_mask.png') for img_fname in img_fname_list]
+                gt_fpath_list = [os.path.join(gt_type_dir, img_fname + '.jpg') for img_fname in img_fname_list]
                 mask.extend(gt_fpath_list)
         assert len(x) == len(y), 'number of x and y should be same'
         return list(x), list(y), list(mask)
@@ -130,14 +133,14 @@ class StcDataset(Dataset):
         # set transforms
         if is_train:
             self.transform_x = T.Compose([
-                T.Resize(c.img_size, Image.ANTIALIAS),
+                T.Resize(c.img_size, Image.LANCZOS),
                 T.RandomRotation(5),
                 T.CenterCrop(c.crp_size),
                 T.ToTensor()])
         # test:
         else:
             self.transform_x = T.Compose([
-                T.Resize(c.img_size, Image.ANTIALIAS),
+                T.Resize(c.img_size, Image.LANCZOS),
                 T.CenterCrop(c.crp_size),
                 T.ToTensor()])
         # mask
@@ -209,14 +212,14 @@ class MVTecDataset(Dataset):
         # set transforms
         if is_train:
             self.transform_x = T.Compose([
-                T.Resize(c.img_size, Image.ANTIALIAS),
+                T.Resize(c.img_size, Image.LANCZOS),
                 T.RandomRotation(5),
                 T.CenterCrop(c.crp_size),
                 T.ToTensor()])
         # test:
         else:
             self.transform_x = T.Compose([
-                T.Resize(c.img_size, Image.ANTIALIAS),
+                T.Resize(c.img_size, Image.LANCZOS),
                 T.CenterCrop(c.crp_size),
                 T.ToTensor()])
         # mask

@@ -25,7 +25,7 @@ def train_meta_epoch(c, epoch, loader, encoder, decoders, optimizer, pool_layers
     adjust_learning_rate(c, optimizer, epoch)
     I = len(loader)
     iterator = iter(loader)
-    for sub_epoch in range(c.sub_epochs):
+    for sub_epoch in tqdm(range(c.sub_epochs), desc=f'Sub Epochs (Meta {epoch})'):
         train_loss = 0.0
         train_count = 0
         for i in range(I):
@@ -256,7 +256,7 @@ def test_meta_fps(c, epoch, loader, encoder, decoders, pool_layers, N):
 
 
 def train(c):
-    run_date = datetime.datetime.now().strftime("%Y-%m-%d-%H:%M:%S")
+    run_date = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
     L = c.pool_layers # number of pooled layers
     print('Number of pool layers =', L)
     encoder, pool_layers, pool_dims = load_encoder_arch(c, L)
@@ -296,7 +296,7 @@ def train(c):
     seg_pro_obs = Score_Observer('SEG_AUPRO')
     if c.action_type == 'norm-test':
         c.meta_epochs = 1
-    for epoch in range(c.meta_epochs):
+    for epoch in tqdm(range(c.meta_epochs), desc='Meta Epochs'):
         if c.action_type == 'norm-test' and c.checkpoint:
             load_weights(encoder, decoders, c.checkpoint)
         elif c.action_type == 'norm-train':
